@@ -2,6 +2,8 @@
   import { db } from '../firebase.js';
   import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
+  export let user
+
   let setlistName = '';
   let saveMessage = '';
   let errorMessage = '';
@@ -29,9 +31,10 @@
 
     try {
       await addDoc(collection(db, 'setlists'), {
-        name: setlistName,
-        createdAt: serverTimestamp(),
-        songs
+      name: setlistName,
+      songs,
+      userId: user.uid,
+      createdAt: serverTimestamp()
       });
 
       saveMessage = 'Setlist saved!';

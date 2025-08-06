@@ -34,7 +34,7 @@
 
     <section>
       <h2>Your Setlists</h2>
-      <SetlistEditor />
+      <SetlistEditor {user} />
       <SetlistList {user} />
     </section>
 

@@ -24,6 +24,7 @@
       );
 
       const snapshot = await getDocs(q);
+      
       setlists = snapshot.docs
         .filter(doc => doc.data().userId === user.uid)
         .map(doc => ({ id: doc.id, ...doc.data() }));
@@ -38,6 +39,7 @@
 </script>
 
 <h3>Your Setlists</h3>
+<button on:click={fetchSetlists}>Refresh List</button>
 
 {#if loading}
   <p>Loading setlists...</p>
