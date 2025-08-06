@@ -35,6 +35,13 @@
     }
   }
 
+  let expanded = [];
+
+  function toggleExpanded(index) {
+    expanded[index] = !expanded[index];
+    expanded = [...expanded]; // reassign to trigger reactivity
+  }
+
   fetchSetlists();
 </script>
 
@@ -49,9 +56,22 @@
   <p>No setlists yet.</p>
 {:else}
   <ul>
-    {#each setlists as setlist}
+    {#each setlists as setlist, i}
       <li>
-        <strong>{setlist.name}</strong> ({setlist.songs.length} songs)
+        <button on:click={() => toggleExpanded(i)} class="setlist-title">
+          <strong>{setlist.name}</strong> ({setlist.songs.length} songs)
+        </button>
+        {#if expanded[i]}
+          <ul class="song-list">
+            {#each setlist.songs as song}
+              <li>
+                <strong>{song.song}</strong><br />
+                {#if song.cues}<em>Cues:</em> {song.cues}<br />{/if}
+                {#if song.notes}<em>Notes:</em> {song.notes}{/if}
+              </li>
+            {/each}
+          </ul>
+        {/if}
       </li>
     {/each}
   </ul>
@@ -68,4 +88,20 @@
     padding-bottom: 0.5em;
     border-bottom: 1px solid #ccc;
   }
+
+  .setlist-title {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1em;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.song-list {
+  margin-left: 1em;
+  margin-top: 0.5em;
+}
+
 </style>
