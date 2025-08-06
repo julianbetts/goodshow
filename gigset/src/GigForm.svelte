@@ -11,26 +11,45 @@
   let error = '';
 
   async function saveGig() {
-    message = '';
-    error = '';
+  message = '';
+  error = '';
 
-    try {
-      await addDoc(collection(db, 'gigs'), {
-        userId: user.uid,
-        title,
-        venue,
-        date,
-        createdAt: serverTimestamp()
-      });
+  try {
+    await addDoc(collection(db, 'gigs'), {
+      userId: user.uid,
+      title,
+      venue,
+      date,
+      createdAt: serverTimestamp(),
+      setlist: [
+        {
+          song: "City Lights",
+          cues: "Watch the drummer for the break",
+          notes: "Use chorus pedal — bass drops out before last verse"
+        },
+        {
+          song: "Black Ribbon",
+          cues: "2-count into chorus",
+          notes: "Cut reverb at end"
+        },
+        {
+          song: "No Moon Tonight",
+          cues: "Vocals only first verse",
+          notes: "Slow fade after bridge"
+        }
+      ]
+    });
 
-      message = 'Gig saved!';
-      title = '';
-      venue = '';
-      date = '';
-    } catch (err) {
-      error = err.message;
-    }
+    // ✅ Form reset + success message
+    message = 'Gig saved!';
+    title = '';
+    venue = '';
+    date = '';
+  } catch (err) {
+    error = err.message;
   }
+}
+
 </script>
 
 <h2>Add a Gig</h2>
