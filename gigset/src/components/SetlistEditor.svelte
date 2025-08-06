@@ -1,16 +1,26 @@
 <script>
   import { db } from '../firebase.js';
-  import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+  import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-  export let user
+  export let user;
 
-  let setlistName = '';
+  let songs = [];
   let saveMessage = '';
   let errorMessage = '';
+  const docRef = doc(db, 'setlists', 'default');
 
-  let songs = [
-    { song: '', cues: '', notes: '' }
-  ];
+  async function loadSetlist() {
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        songs = docSnap.data().songs || [];
+      } else {
+        songs = [];
+      }
+    } catch (err) {
+      errorMessage = 'Failed to load setlist: ' + err.message;
+    }
+  }
 
   function addSong() {
     songs = [...songs, { song: '', cues: '', notes: '' }];
@@ -21,82 +31,55 @@
   }
 
   async function saveSetlist() {
-    saveMessage = '';
-    errorMessage = '';
-
-    if (!setlistName.trim()) {
-      errorMessage = 'Setlist name is required.';
-      return;
-    }
-
     try {
-      await addDoc(collection(db, 'setlists'), {
-      name: setlistName,
-      songs,
-      userId: user.uid,
-      createdAt: serverTimestamp()
+      await setDoc(docRef, {
+        songs,
+        userId: user.uid,
+        updatedAt: serverTimestamp()
       });
-
       saveMessage = 'Setlist saved!';
-      setlistName = '';
-      songs = [{ song: '', cues: '', notes: '' }];
     } catch (err) {
-      errorMessage = 'Error: ' + err.message;
+      errorMessage = 'Error saving setlist: ' + err.message;
     }
   }
+
+  loadSetlist();
 </script>
 
-<h2>Create a New Setlist</h2>
-
-<input bind:value={setlistName} placeholder="Setlist Name" required />
+<h2>Edit Setlist</h2>
 
 {#each songs as song, i}
   <div class="song-block">
     <input bind:value={song.song} placeholder="Song name" />
-    <input bind:value={song.cues} placeholder="Cues (optional)" />
-    <textarea bind:value={song.notes} placeholder="Notes (optional)"></textarea>
-    <button on:click={() => removeSong(i)} class="delete-button">🗑️</button>
+    <input bind:value={song.cues} placeholder="Cues" />
+    <textarea bind:value={song.notes} placeholder="Notes"></textarea>
+    <button on:click={() => removeSong(i)}>🗑️</button>
   </div>
 {/each}
 
 <button on:click={addSong}>+ Add Song</button>
-<button on:click={saveSetlist}>💾 Save Setlist</button>
+<button on:click={saveSetlist}>💾 Save</button>
 
 {#if saveMessage}<p class="success">{saveMessage}</p>{/if}
 {#if errorMessage}<p class="error">{errorMessage}</p>{/if}
 
 <style>
-  input, textarea {
-    padding: 0.5em;
-    margin-bottom: 0.5em;
-    width: 100%;
-    font-size: 1em;
-  }
-
   .song-block {
+    margin-bottom: 1em;
     border: 1px solid #ccc;
     padding: 1em;
-    margin-bottom: 1em;
-    position: relative;
   }
 
-  .delete-button {
-    position: absolute;
-    top: 0.5em;
-    right: 0.5em;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2em;
+  input, textarea {
+    width: 100%;
+    margin-bottom: 0.5em;
   }
 
   .success {
     color: green;
-    margin-top: 1em;
   }
 
   .error {
     color: red;
-    margin-top: 1em;
   }
 </style>
