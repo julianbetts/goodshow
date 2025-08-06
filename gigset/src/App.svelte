@@ -1,6 +1,7 @@
 <script>
   import Auth from './Auth.svelte';
   import GigForm from './GigForm.svelte';
+  import GigList from './GigList.svelte';
   import { onMount } from 'svelte';
   import { auth } from './firebase.js';
   import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -23,6 +24,7 @@
     <p>Logged in as {user.email}</p>
     <button on:click={logout}>Log Out</button>
     <GigForm {user} />
+    <GigList {user} />
   {:else}
     <Auth />
   {/if}
