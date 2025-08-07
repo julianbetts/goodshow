@@ -33,6 +33,7 @@
     view = 'main';
   }
 </script>
+
 <main>
   {#if user}
     <p>Logged in as {user.email}</p>
