@@ -1,7 +1,7 @@
 <script>
   import Auth from './Auth.svelte';
-  import GigForm from './GigForm.svelte';
-  import GigList from './GigList.svelte';
+  import GigForm from './GigForm.svelte'
+  import GigTable from './components/GigTable.svelte';
   import SetlistView from './components/SetlistView.svelte';
   import SetlistEditor from './components/SetlistEditor.svelte';
   import { onMount } from 'svelte';
@@ -50,13 +50,14 @@
     {:else}
       <button on:click={goToViewSetlist}>🎵 View Setlist</button>
 
-      <section>
-        <h2>Upcoming Gigs</h2>
-        <GigForm {user} />
-        <GigList {user} />
-      </section>
+    <section>
+      <h2>Upcoming Gigs</h2>
+      <!-- <GigForm {user} /> -->
+      <GigTable {user} />
+    </section>
+
     {/if}
-  {:else}
+    {:else}
     <Auth />
   {/if}
 </main>
