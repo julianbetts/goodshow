@@ -1,14 +1,15 @@
 <script>
   import Auth from './Auth.svelte';
-  import GigForm from './GigForm.svelte';
-  import GigList from './GigList.svelte';
+  import GigForm from './GigForm.svelte'
+  import GigTable from './components/GigTable.svelte';
+  import SetlistView from './components/SetlistView.svelte';
   import SetlistEditor from './components/SetlistEditor.svelte';
-  import SetlistList from './components/SetlistList.svelte';
   import { onMount } from 'svelte';
   import { auth } from './firebase.js';
   import { onAuthStateChanged, signOut } from 'firebase/auth';
 
   let user = null;
+  let view = 'main'; // 'main' | 'viewSetlist' | 'editSetlist'
 
   onMount(() => {
     onAuthStateChanged(auth, (u) => {
@@ -19,6 +20,18 @@
   function logout() {
     signOut(auth);
   }
+
+  function goToViewSetlist() {
+    view = 'viewSetlist';
+  }
+
+  function goToEditSetlist() {
+    view = 'editSetlist';
+  }
+
+  function goToMain() {
+    view = 'main';
+  }
 </script>
 
 <main>
@@ -26,27 +39,33 @@
     <p>Logged in as {user.email}</p>
     <button on:click={logout}>Log Out</button>
 
+    {#if view === 'viewSetlist'}
+      <SetlistView on:edit={goToEditSetlist} />
+      <button on:click={goToMain}>⬅ Back</button>
+
+    {:else if view === 'editSetlist'}
+      <SetlistEditor {user} />
+      <button on:click={goToViewSetlist}>⬅ Back to Setlist</button>
+
+    {:else}
+      <button on:click={goToViewSetlist}>🎵 View Setlist</button>
+
     <section>
       <h2>Upcoming Gigs</h2>
-      <GigForm {user} />
-      <GigList {user} />
+      <!-- <GigForm {user} /> -->
+      <GigTable {user} />
     </section>
 
-    <section>
-      <h2>Your Setlists</h2>
-      <SetlistEditor {user} />
-      <SetlistList {user} />
-    </section>
-
-  {:else}
+    {/if}
+    {:else}
     <Auth />
   {/if}
 </main>
 
 <style>
   button {
-    margin-top: 1em;
-    padding: 0.5em;
+    margin: 0.5em 0.5em 1em 0;
+    padding: 0.5em 1em;
     font-weight: bold;
   }
 
